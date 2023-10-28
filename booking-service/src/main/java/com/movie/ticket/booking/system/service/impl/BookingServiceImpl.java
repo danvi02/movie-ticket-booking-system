@@ -33,8 +33,11 @@ public class BookingServiceImpl implements BookingService {
                 .build();
         this.bookingRepository.save(bookingEntity); // create a booking with booking status as PENDING
         bookingDTO.setBookingId(bookingEntity.getBookingId());
+        bookingDTO.setBookingStatus(BookingStatus.PENDING);
         // call payment service
-        bookingDTO = this.paymentServiceBroker.makePayment(bookingDTO);
+        bookingDTO = this.paymentServiceBroker.makePayment(bookingDTO); // Kafka -> ensures that even if the payment service is not up and running,
+        // It will store the requests data in the Kafka topics in sequential order. Lets say if the payment service is UP after some time,
+        //Then requests available in Kafka topic will be taken by payment service to process the requests.(5, 10 , 20) reloading icon
         bookingEntity.setBookingStatus(bookingDTO.getBookingStatus());
         return BookingDTO.builder()
                 .bookingId(bookingEntity.getBookingId())

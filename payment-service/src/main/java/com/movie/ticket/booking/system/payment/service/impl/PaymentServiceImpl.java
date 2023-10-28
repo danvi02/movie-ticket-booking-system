@@ -36,11 +36,10 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
         this.paymentRepository.save(paymentEntity);
         // make a call to Payment Gateway
-        PaymentStatus paymentStatus = this.stripePaymentGateway.makePayment(paymentEntity.getPaymentAmount());
+        this.stripePaymentGateway.makePayment(bookingDTO);
         paymentEntity.setPaymentTimestamp(LocalDateTime.now());
-        if(paymentStatus.equals(PaymentStatus.APPROVED)){
-            paymentEntity.setPaymentStatus(paymentStatus);
-            bookingDTO.setBookingStatus(BookingStatus.CONFIRMED);
+        if(bookingDTO.getBookingStatus().equals(BookingStatus.CONFIRMED)){
+            paymentEntity.setPaymentStatus(PaymentStatus.APPROVED);
         }else{
             paymentEntity.setPaymentStatus(PaymentStatus.FAILED);
             bookingDTO.setBookingStatus(BookingStatus.CANCELLED);

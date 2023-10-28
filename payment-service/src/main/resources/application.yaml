@@ -34,4 +34,4 @@ management:
         enabled: true
 
 stripe:
-  key:
+  key: sk_test_51J9QEfSJ251E1BhYfT5KAT2kF2Ht7Td8qTtVGbVVewjrN3k2pmeVG2tbwNd3csbiGUitkEayv0Pae829sVUHV3Vj00mDIjVjOy
