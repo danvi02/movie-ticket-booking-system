@@ -38,9 +38,9 @@ public class StripePaymentGateway {
 //            PaymentIntent paymentIntent = PaymentIntent.create(params);
             Map<String, Object> chargeParams = new HashMap<>();
             chargeParams.put("amount", (int)Math.round(bookingDTO.getBookingAmount()));
-            chargeParams.put("currency", "usd");
+            chargeParams.put("currency", "inr");
             chargeParams.put("description", "Test Payment");
-            chargeParams.put("source", "tok_us");
+            chargeParams.put("source", "tok_visa");
             Charge.create(chargeParams);
             bookingDTO.setBookingStatus(BookingStatus.CONFIRMED);
         }catch(Exception e){
