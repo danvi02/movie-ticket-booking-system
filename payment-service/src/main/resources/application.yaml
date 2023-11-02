@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:8081}
+  port: ${SERVER_PORT:8082}
 spring:
   application:
     name: ${APPLICATION_NAME:payment-service}
@@ -11,6 +11,22 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  kafka:
+    consumer:
+      bootstrap-servers:
+        - "localhost:19092"
+        - "localhost:29092"
+        - "localhost:39092"
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+    producer:
+      bootstrap-servers:
+        - "localhost:19092"
+        - "localhost:29092"
+        - "localhost:39092"
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 eureka:
   client:
@@ -34,4 +50,4 @@ management:
         enabled: true
 
 stripe:
-  key: 
+  key: sk_test_51J9QEfSJ251E1BhYfT5KAT2kF2Ht7Td8qTtVGbVVewjrN3k2pmeVG2tbwNd3csbiGUitkEayv0Pae829sVUHV3Vj00mDIjVjOy

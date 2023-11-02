@@ -7,6 +7,7 @@ import com.movie.ticket.booking.system.payment.service.PaymentService;
 import com.movie.ticket.booking.system.payment.service.dto.PaymentDto;
 import com.movie.ticket.booking.system.payment.service.entity.PaymentEntity;
 import com.movie.ticket.booking.system.payment.service.entity.PaymentStatus;
+import com.movie.ticket.booking.system.payment.service.kafka.publisher.PaymentServiceKafkaPublisher;
 import com.movie.ticket.booking.system.payment.service.repository.PaymentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,20 @@ import java.time.LocalDateTime;
 public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
+    private PaymentServiceKafkaPublisher paymentServiceKafkaPublisher;
+
+    @Autowired
     private StripePaymentGateway stripePaymentGateway;
 
     @Autowired
     private PaymentRepository paymentRepository;
 
+
+
     @Override
     @Transactional
-    public BookingDTO makePayment(BookingDTO bookingDTO) {
+    public void processPayment(BookingDTO bookingDTO) {
+        log.info("received booking details in payment service with data {}", bookingDTO.toString());
         log.info(LoggerConstants.ENTERED_SERVICE_MESSAGE.getValue(), "createPayment", this.getClass());
         PaymentEntity paymentEntity = PaymentEntity.builder()
                 .paymentStatus(PaymentStatus.PENDING)
@@ -35,7 +42,6 @@ public class PaymentServiceImpl implements PaymentService {
                 .bookingId(bookingDTO.getBookingId())
                 .build();
         this.paymentRepository.save(paymentEntity);
-        // make a call to Payment Gateway
         this.stripePaymentGateway.makePayment(bookingDTO);
         paymentEntity.setPaymentTimestamp(LocalDateTime.now());
         if(bookingDTO.getBookingStatus().equals(BookingStatus.CONFIRMED)){
@@ -44,6 +50,6 @@ public class PaymentServiceImpl implements PaymentService {
             paymentEntity.setPaymentStatus(PaymentStatus.FAILED);
             bookingDTO.setBookingStatus(BookingStatus.CANCELLED);
         }
-        return bookingDTO;
+        this.paymentServiceKafkaPublisher.pushDataToPaymentResponseTopic(bookingDTO);
     }
 }

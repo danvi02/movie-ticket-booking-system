@@ -4,6 +4,6 @@ import com.movie.ticket.booking.system.commons.dto.BookingDTO;
 import org.springframework.web.bind.annotation.RequestBody;
 
 public interface PaymentService {
-    public BookingDTO makePayment(@RequestBody BookingDTO bookingDTO);
+    public void processPayment(BookingDTO bookingDTO);
 }
 
